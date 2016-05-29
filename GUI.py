@@ -93,16 +93,28 @@ def sudokuBoardEvent(mPos, tab):
             if isInField(i, j, x, y) == True:
                 print tab[i][j]
                 return
-def changeChar(event, board):
+def changeChar(event, board, constTab):
    tab = board
    if isSelectedField == True:
          i, j = selIndexField
-         pressed = event.key
-         if pressed > pygame.K_0 and pressed <= pygame.K_9:
-            tab[i] = replaceChar(board[i],j,str(event.key-48))
-            return tab
+         if constTab[i][j] != '1':
+             pressed = event.key
+             if pressed > pygame.K_0 and pressed <= pygame.K_9:
+                tab[i] = replaceChar(board[i],j,str(event.key-48))
+                return tab
    return board
-    
+
+def drawDeadField(window, position):
+    window.blit(gConstField, position)
+
+def addDeadField(window, tab):
+    for i in range(len(tab)):
+        for j in range(len(tab[i])):
+            if tab[i][j] == '1':
+                x = 156 + lineSize(j) + 32 * j
+                y = 106 + lineSize(i) + 32 * i
+                drawDeadField(window, (x, y))
+ 
 #Główne okno gry;
 pygame.init()
 pygame.display.set_caption('Sudoku')
@@ -115,7 +127,8 @@ gSudokuBoard = pygame.image.load('Graphics\Board.png')
 gMenuPanel = pygame.image.load('Graphics\MainOptions.png')
 gGamePanel = pygame.image.load('Graphics\GamePanel.png')
 gSelectedField = pygame.image.load('Graphics\Selected.png')
-gSelectedOption =pygame.image.load('Graphics\SelectedOption.png')
+gSelectedOption = pygame.image.load('Graphics\SelectedOption.png')
+gConstField = pygame.image.load('Graphics\ConstField.png')
 
 #Zmienne opisujące stan;
 isSelectedOption = False
@@ -140,7 +153,7 @@ while True:
         if event.type == pygame.MOUSEBUTTONUP and isSelectedOption == True:
             isSelectedOption = False
         if event.type == pygame.KEYDOWN:
-         mainBoard = changeChar(event, mainBoard)
+            mainBoard = changeChar(event, mainBoard, constBoard)
 
 #Rysowanie okna i jego elementów;
     window.fill(bgColour)
@@ -151,6 +164,7 @@ while True:
         window.blit(gSelectedOption, selOptionPos)
     if isSelectedField == True:
         window.blit(gSelectedField, selFieldPos)
+    addDeadField(window, constBoard)
     if isSelectedField == True:
         window.blit(gSelectedField, selFieldPos)
     pygame.display.flip()
