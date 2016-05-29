@@ -1,4 +1,6 @@
 import pygame, sys, os
+from fileLib import replaceChar
+
 
 #Tablice danych przedstawiające plansze Sudoku i jeje stan;
 mainBoard = []#aktualne wartości prezentowane na planszy sudoku;
@@ -91,7 +93,16 @@ def sudokuBoardEvent(mPos, tab):
             if isInField(i, j, x, y) == True:
                 print tab[i][j]
                 return
-
+def changeChar(event, board):
+   tab = board
+   if isSelectedField == True:
+         i, j = selIndexField
+         pressed = event.key
+         if pressed > pygame.K_0 and pressed <= pygame.K_9:
+            tab[i] = replaceChar(board[i],j,str(event.key-48))
+            return tab
+   return board
+    
 #Główne okno gry;
 pygame.init()
 pygame.display.set_caption('Sudoku')
@@ -128,6 +139,8 @@ while True:
             sudokuBoardEvent(pygame.mouse.get_pos(), mainBoard)
         if event.type == pygame.MOUSEBUTTONUP and isSelectedOption == True:
             isSelectedOption = False
+        if event.type == pygame.KEYDOWN:
+         mainBoard = changeChar(event, mainBoard)
 
 #Rysowanie okna i jego elementów;
     window.fill(bgColour)
