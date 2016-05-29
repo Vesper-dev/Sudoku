@@ -68,9 +68,29 @@ def gamePanel(mPos):
             isSelectedOption = True
             selOptionPos = 525, 205
             print 'Solve'
+
+def isInField(i, j, pX, pY):
+    global isSelectedField
+    x = 156 + lineSize(j) + 32 * j
+    y = 106 + lineSize(i) + 32 * i
+    if pX >= x and pX <= x + 32:
+        if pY >= y and pY <= y + 32:
+            global selFieldPos, selIndexField
+            selIndexField = i, j
+            selFieldPos = x, y
+            isSelectedField = True
+            return True
+    isSelectedField = False
+    return False
     
-def sudokuBoardEvent(mPos):
-    pass
+def sudokuBoardEvent(mPos, tab):
+    global isSelectedField, selFieldPos
+    x, y = mPos
+    for i in range(len(tab)):
+        for j in range(len(tab[i])):
+            if isInField(i, j, x, y) == True:
+                print tab[i][j]
+                return
 
 #Główne okno gry;
 pygame.init()
@@ -93,6 +113,7 @@ isSelectedField = False
 #Pozycje elementów graficznych;
 selOptionPos = 0, 0
 selFieldPos = 0, 0
+selIndexField = 0, 0
 
 #Pętla główna okna;
 while True:
@@ -104,7 +125,7 @@ while True:
             sys.exit(0)
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             menuPanelEvent(pygame.mouse.get_pos())
-            sudokuBoardEvent(pygame.mouse.get_pos())
+            sudokuBoardEvent(pygame.mouse.get_pos(), mainBoard)
         if event.type == pygame.MOUSEBUTTONUP and isSelectedOption == True:
             isSelectedOption = False
 
@@ -115,6 +136,8 @@ while True:
     window.blit(gGamePanel, (520, 100))
     if isSelectedOption == True:
         window.blit(gSelectedOption, selOptionPos)
+    if isSelectedField == True:
+        window.blit(gSelectedField, selFieldPos)
     if isSelectedField == True:
         window.blit(gSelectedField, selFieldPos)
     pygame.display.flip()
