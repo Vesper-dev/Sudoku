@@ -20,10 +20,12 @@ def read(fName):
         return 1
     
 def writeLines(fName, listOfRow):
+    tab = []
+    tab = listOfRow[:]
     file = open(fName,'w')
-    addSpace(file)
+    addSpace(tab)
     try:
-        for i in listOfRow:
+        for i in tab:
             if i[len(i)-1] != '\n':
                 i+='\n'
             file.write(i)
