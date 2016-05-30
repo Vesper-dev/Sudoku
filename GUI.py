@@ -1,11 +1,13 @@
 import pygame, sys, os
-from fileLib import replaceChar
+from fileLib import replaceChar, read, writeLines
+from mixBoard import getBoard
+from generateHTML import generateHTML
 
 
 #Tablice danych przedstawiające plansze Sudoku i jeje stan;
 mainBoard = []#aktualne wartości prezentowane na planszy sudoku;
 for i in range(9):
-    mainBoard.append('100010001')
+    mainBoard.append('000000000')
 constBoard = mainBoard#przechowuje miejsca w tablicy których nie można zmienić;
 
 #Funkcje wykorzystywane przez program;
@@ -34,26 +36,41 @@ def menuPanelEvent(mPos):
     gamePanel(mPos)
     
 def menuPanel(mPos):
-    global  isSelectedOption, selOptionPos
+    global  isSelectedOption, selOptionPos, isMessage, messageType
     x, y = mPos
     if y >=5 and y <= 25:
         if x >= 5 and x <= 75:
             isSelectedOption = True
             selOptionPos = 5, 5
             print 'New'
+            isMessage = True
+            messageType = 0
         if x >= 85 and x <= 155:
             isSelectedOption = True
             selOptionPos = 85, 5
             print 'Load'
+            loadBoard()
         if x >= 165 and x <= 235:
             isSelectedOption = True
             selOptionPos = 165, 5
             print 'Save'
+            writeLines('Save/board.txt', mainBoard)
         if x >= 245 and x <= 315:
             isSelectedOption = True
             selOptionPos = 245, 5
             print 'Print'
-            
+            generateHTML(mainBoard, 'HTML/toPrint.html')
+
+def loadBoard():
+    global mainBoard, constBoard
+    mainBoard = read('Load/board.txt')
+    for i in range(len(mainBoard)):
+        for j in range(len(mainBoard[i])):
+            if mainBoard[i][j] != '0':
+                constBoard[i] = replaceChar(constBoard[i], j, '1')
+            else:
+                constBoard[i] = replaceChar(constBoard[i], j, '0')
+    
 def gamePanel(mPos):
     global  isSelectedOption, selOptionPos
     x, y = mPos
@@ -114,7 +131,74 @@ def addDeadField(window, tab):
                 x = 156 + lineSize(j) + 32 * j
                 y = 106 + lineSize(i) + 32 * i
                 drawDeadField(window, (x, y))
- 
+
+def messageService(position):
+    x, y=position
+    if x>= 252 and x <398:
+        if messageType == 0:
+            difficultyService(position)
+        if messageType == 1:
+            correctService(position)
+        if messageType == 2:
+            successService(position)
+        if messageType == 3:
+            wrongService(position)
+
+def difficultyService(position):
+   x, y = position
+   global isMessage
+   global mainBoard
+   if y>=177 and y<207:
+      setNewBoard(1)
+      isMessage = False
+   if y>=209 and y<239:
+      setNewBoard(2)
+      isMessage = False
+   if y>=241 and y<273:
+      setNewBoard(4)
+      isMessage = False
+      
+def setNewBoard(difficult):
+    global mainBoard, constBoard
+    mainBoard = getBoard(difficult)
+    for i in range(len(mainBoard)):
+        for j in range(len(mainBoard[i])):
+            if mainBoard[i][j] != '0':
+                constBoard[i] = replaceChar(constBoard[i], j, '1')
+            else:
+                constBoard[i] = replaceChar(constBoard[i], j, '0')
+                
+def correctService(position):
+   x, y = position
+   global isMessage
+   if y>=241 and y<273:
+      isMessage = False
+
+def successService(position):
+   x, y = position
+   global isMessage
+   if y>=241 and y<273:
+      isMessage = False
+
+def wrongService(position):
+   x, y = position
+   global isMessage
+   if y>=241 and y<273:
+      isMessage = False
+
+def displayMessage(window):
+    if isMessage == True:
+        position = 250, 175
+        if messageType == 0:
+            window.blit(gDifficulty, position)
+        if messageType == 1:
+            window.blit(gCorrect, position)
+        if messageType == 2:
+            window.blit(gSuccess, position)
+        if messageType == 3:
+            window.blit(gWrong, position)
+
+
 #Główne okno gry;
 pygame.init()
 pygame.display.set_caption('Sudoku')
@@ -129,15 +213,23 @@ gGamePanel = pygame.image.load('Graphics\GamePanel.png')
 gSelectedField = pygame.image.load('Graphics\Selected.png')
 gSelectedOption = pygame.image.load('Graphics\SelectedOption.png')
 gConstField = pygame.image.load('Graphics\ConstField.png')
+gDifficulty = pygame.image.load('Graphics\difficulti.png')
+gCorrect = pygame.image.load('Graphics\correct.png')
+gSuccess = pygame.image.load('Graphics\success.png')
+gWrong = pygame.image.load('Graphics\wrong.png')
 
 #Zmienne opisujące stan;
 isSelectedOption = False
 isSelectedField = False
+isMessage = False
 
 #Pozycje elementów graficznych;
 selOptionPos = 0, 0
 selFieldPos = 0, 0
 selIndexField = 0, 0
+
+#Zmienne dodatkowe;
+messageType = 0
 
 #Pętla główna okna;
 while True:
@@ -148,11 +240,14 @@ while True:
             pygame.quit()
             sys.exit(0)
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            menuPanelEvent(pygame.mouse.get_pos())
-            sudokuBoardEvent(pygame.mouse.get_pos(), mainBoard)
+            if isMessage != True:
+                menuPanelEvent(pygame.mouse.get_pos())
+                sudokuBoardEvent(pygame.mouse.get_pos(), mainBoard)
+            else:
+                messageService(pygame.mouse.get_pos())
         if event.type == pygame.MOUSEBUTTONUP and isSelectedOption == True:
             isSelectedOption = False
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN and isMessage == False:
             mainBoard = changeChar(event, mainBoard, constBoard)
 
 #Rysowanie okna i jego elementów;
@@ -167,6 +262,7 @@ while True:
     addDeadField(window, constBoard)
     if isSelectedField == True:
         window.blit(gSelectedField, selFieldPos)
+    displayMessage(window)
     pygame.display.flip()
 
 
