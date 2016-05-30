@@ -3,20 +3,19 @@ from fileLib import *
 
 def generateHTML(src, fName):
     htmlTemp=[]
-    tempName = 'Template/htmlTemp.html'
-    htmlTemp=read(tempName)
+    tempName = 'HTML/htmlTemp.html'
+    htmlTemp=readOutSpace(tempName)
     
     for i in src:
         for j in i:
-            if j != ' ' and j!='\n':
-                for k in range(lenght(tempName)):
-                    if isField(htmlTemp[k]):
-                        if j != '0':
-                            htmlTemp[k] = insertChar(htmlTemp[k],20,j);
-                        else:
-                            htmlTemp[k] = insertChar(htmlTemp[k],20,' ');
-                        break
-    writeLines(fName, htmlTemp)
+            for k in range(lenght(tempName)):
+                if isField(htmlTemp[k]):
+                    if j != '0':
+                        htmlTemp[k] = insertChar(htmlTemp[k],20,j);
+                    else:
+                        htmlTemp[k] = insertChar(htmlTemp[k],20,' ');
+                    break
+    write(fName, htmlTemp)
 
 def isField(string):
     if len(string) == 26:

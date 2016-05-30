@@ -18,7 +18,21 @@ def read(fName):
     except IOError :
         print("Error: file: "+fName+" doesn't exist")
         return 1
-    
+
+def readOutSpace(fName):
+    try:
+        table=[]
+        file = open(fName,'r')
+        try:
+            for x in range(lenght(fName)):
+                table.append(file.readline())  
+        finally:
+            file.close()
+        return table
+    except IOError :
+        print("Error: file: "+fName+" doesn't exist")
+        return 1
+ 
 def writeLines(fName, listOfRow):
     tab = []
     tab = listOfRow[:]
@@ -28,16 +42,17 @@ def writeLines(fName, listOfRow):
         for i in tab:
             if i[len(i)-1] != '\n':
                 i+='\n'
-            file.write(i)
-            
-                
+            file.write(i)      
     finally:
         file.close()
 
 def write(fName, buffer):
     file = open(fName,'w')
     try:
-        file.write(buffer)
+        for i in buffer:
+            if i[len(i)-1] != '\n':
+                i+='\n'
+            file.write(i)      
     finally:
         file.close()
 		
