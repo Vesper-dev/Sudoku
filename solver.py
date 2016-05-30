@@ -2,9 +2,6 @@ import random
 from check import check
 from fileLib import read, writeLines, replaceChar, addSpace, deleteSpace
 
-tab=[]
-tab=read('2.txt')
-
 def possibilityTab(board):
     cTab=[]
     for i in range(9):
@@ -45,7 +42,7 @@ def isSolved(board):
 
 def heuristicSolving(board):
     tab = []
-    tab=board
+    tab=board[:]
     test=[]
     while True:
         if test == tab: break
@@ -66,7 +63,6 @@ def bruteforceSolve(board):
     tab = setValues(cTab, tab, 0, 0, 9, 9)
     return tab
 
-iter=0
 def setValues(cTab, tab, x, y, ex, ey):
     newTab = []
     newTab = tab
