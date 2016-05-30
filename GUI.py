@@ -2,6 +2,7 @@ import pygame, sys, os
 from fileLib import replaceChar, read, writeLines
 from mixBoard import getBoard
 from generateHTML import generateHTML
+from solver import prompt, bruteforceSolve
 
 
 #Tablice danych przedstawiające plansze Sudoku i jeje stan;
@@ -9,6 +10,8 @@ mainBoard = []#aktualne wartości prezentowane na planszy sudoku;
 for i in range(9):
     mainBoard.append('000000000')
 constBoard = mainBoard#przechowuje miejsca w tablicy których nie można zmienić;
+solved = []
+solved = mainBoard[:]
 
 #Funkcje wykorzystywane przez program;
 def lineSize(index):#Zwraca ile grubości lini doliczyć;
@@ -62,7 +65,7 @@ def menuPanel(mPos):
             generateHTML(mainBoard, 'HTML/toPrint.html')
 
 def loadBoard():
-    global mainBoard, constBoard
+    global mainBoard, constBoard, solved
     mainBoard = read('Load/board.txt')
     for i in range(len(mainBoard)):
         for j in range(len(mainBoard[i])):
@@ -70,23 +73,40 @@ def loadBoard():
                 constBoard[i] = replaceChar(constBoard[i], j, '1')
             else:
                 constBoard[i] = replaceChar(constBoard[i], j, '0')
+    solved = bruteforceSolve(mainBoard)
     
 def gamePanel(mPos):
-    global  isSelectedOption, selOptionPos
+    global  isSelectedOption, selOptionPos, mainBoard
     x, y = mPos
     if x >=525 and x <= 595:
         if y >= 105 and y <= 125:
             isSelectedOption = True
             selOptionPos = 525, 105
             print 'Prompt'
+            prompt(mainBoard)
         if y >= 155 and y <= 175:
             isSelectedOption = True
             selOptionPos = 525, 155
             print 'Check'
+            checkSudoku()
         if y >= 205 and y <= 225:
             isSelectedOption = True
             selOptionPos = 525, 205
             print 'Solve'
+            mainBoard = solved
+
+def checkSudoku():
+    global isMessage, messageType
+    global solved, mainBoard
+    for i in range(9):
+        for j in range(9):
+            if mainBoard[i][j] != '0':
+                if mainBoard[i][j] != solved[i][j]:
+                    isMessage = True
+                    messageType = 3
+                    return
+    isMessage = True
+    messageType = 1
 
 def isInField(i, j, pX, pY):
     global isSelectedField
@@ -110,6 +130,7 @@ def sudokuBoardEvent(mPos, tab):
             if isInField(i, j, x, y) == True:
                 print tab[i][j]
                 return
+            
 def changeChar(event, board, constTab):
    tab = board
    if isSelectedField == True:
@@ -159,7 +180,7 @@ def difficultyService(position):
       isMessage = False
       
 def setNewBoard(difficult):
-    global mainBoard, constBoard
+    global mainBoard, constBoard, solved
     mainBoard = getBoard(difficult)
     for i in range(len(mainBoard)):
         for j in range(len(mainBoard[i])):
@@ -167,6 +188,7 @@ def setNewBoard(difficult):
                 constBoard[i] = replaceChar(constBoard[i], j, '1')
             else:
                 constBoard[i] = replaceChar(constBoard[i], j, '0')
+    solved = bruteforceSolve(mainBoard)
                 
 def correctService(position):
    x, y = position
