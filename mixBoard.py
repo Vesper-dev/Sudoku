@@ -85,11 +85,10 @@ def generateBoard(board):
         mixSubfieldColumn(board)
         
 def addGap(board, difficultyLevel):
-    xPool=[0,2,4,6,8,10,12,14,16]
-    yPool=[0,1,2,3,4,5,6,7,8]
+    pool=[0,1,2,3,4,5,6,7,8]
     for i in range(difficultyLevel*10):
-        x = random.choice(xPool)
-        y = random.choice(yPool)
+        x = random.choice(pool)
+        y = random.choice(pool)
         board[y] = replaceChar(board[y], x, '0')
         
 def getBoard(difficultyLevel):

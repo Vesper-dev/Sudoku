@@ -13,6 +13,7 @@ def read(fName):
                 table.append(file.readline())  
         finally:
             file.close()
+        deleteSpace(table)
         return table
     except IOError :
         print("Error: file: "+fName+" doesn't exist")
@@ -20,6 +21,7 @@ def read(fName):
     
 def writeLines(fName, listOfRow):
     file = open(fName,'w')
+    addSpace(file)
     try:
         for i in listOfRow:
             if i[len(i)-1] != '\n':
