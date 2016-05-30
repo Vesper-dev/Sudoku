@@ -36,8 +36,6 @@ def mixSubfieldRow(board):
         replaceSubfieldInRow(board, numSub, numSub2)
 
 def replaceColumn(tab, numC1, numC2):
-    numC1*=2
-    numC2*=2
     if argTest(len(tab[0]), numC1, numC2):
         print('Bad arguments')
     else:
