@@ -3,8 +3,7 @@ from check import check
 from fileLib import read, writeLines, replaceChar, addSpace, deleteSpace
 
 tab=[]
-tab=read('3.txt')
-deleteSpace(tab)
+tab=read('2.txt')
 
 def possibilityTab(board):
     cTab=[]
@@ -55,7 +54,7 @@ def heuristicSolving(board):
         tab=newBoardSolved(tab, possibilityTab(tab))
     return tab
 
-def bruteforceSolvin(board):
+def bruteforceSolve(board):
     tab=[]
     tab = heuristicSolving(board)
     cTab=[]
@@ -90,9 +89,14 @@ def setValues(cTab, tab, x, y, ex, ey):
                     cTab[i][j]=box
     return newTab
                 
+def prompt(tab):
+    solved = []
+    solved = bruteforceSolve(tab)
+    for i in range(9):
+        for j in range(9):
+            if tab[i][j] == '0':
+                tab[i] = replaceChar(tab[i], j, solved[i][j])
+                return
+        
+    
 
-s=[]
-s=bruteforceSolvin(tab)
-addSpace(s)
-for i in s:
-    print(i)
